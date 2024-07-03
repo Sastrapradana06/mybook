@@ -1,26 +1,80 @@
+"use client";
+
 import { CiEdit } from "react-icons/ci";
 import { MdDeleteOutline } from "react-icons/md";
 import Button from "../atoms/button";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Loading from "./loading";
 
 type TableProps = {
   id: number;
+  image: string;
   judulBuku: string;
   jenisBuku: string;
   penerbit: string;
   tahunTerbit: String;
 };
 
-export default function Table({
-  data,
-  funcDelete,
-  funcEdit,
-}: {
-  data: any;
-  funcDelete: any;
-  funcEdit: any;
-}) {
+export default function Table({ data }: { data: any }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState({
+    status: false,
+    type: "",
+    message: "",
+  });
+
+  const router = useRouter();
+
+  const deleteData = async (id: number) => {
+    setIsLoading(true);
+    const res = await fetch("http://localhost:3000/api/buku/hapus-buku", {
+      method: "POST",
+      body: JSON.stringify({ id }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await res.json();
+    if (data.status) {
+      setMessage({
+        status: true,
+        type: "success",
+        message: "Berhasil menghapus buku",
+      });
+    } else {
+      setMessage({
+        status: true,
+        type: "error",
+        message: "Gagal",
+      });
+    }
+
+    setIsLoading(false);
+  };
+
+  const editData = (id: number) => {
+    router.push(`/tambah-buku?id=${id}`);
+  };
+
   return (
     <>
+      {isLoading ? <Loading /> : null}
+      {message.status &&
+        (message.type === "success" ? (
+          <div className="w-max mb-2 h-max m-auto">
+            <h1 className="text-[.9rem] text-green-500 font-semibold">
+              {message.message}
+            </h1>
+          </div>
+        ) : (
+          <div className="w-max mb-2 h-max m-auto">
+            <h1 className="text-[.9rem] text-red-500 font-semibold">
+              {message.message}
+            </h1>
+          </div>
+        ))}
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs  uppercase bg-[#4D44B5] text-white">
@@ -30,6 +84,9 @@ export default function Table({
               </th>
               <th scope="col" className="px-6 py-3">
                 Judul Buku
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Image
               </th>
               <th scope="col" className="px-6 py-3">
                 Jenis Buku
@@ -52,14 +109,22 @@ export default function Table({
                 key={i}
               >
                 <td className="px-6 py-4">{i + 1}</td>
-                <th
+
+                <td
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white capitalize"
                 >
                   {item.judulBuku}
-                </th>
-                <td className="px-6 py-4">{item.jenisBuku}</td>
-                <td className="px-6 py-4">{item.penerbit}</td>
+                </td>
+                <td className=" py-4 px-4">
+                  <img
+                    src={item.image}
+                    className="w-[40px] h-[40px] border object-cover rounded-full "
+                    alt="image"
+                  />
+                </td>
+                <td className="px-6 py-4 capitalize">{item.jenisBuku}</td>
+                <td className="px-6 py-4 capitalize">{item.penerbit}</td>
                 <td className="px-6 py-4">{item.tahunTerbit}</td>
                 <td className="px-6 py-4 flex items-center gap-3">
                   <Button
@@ -67,27 +132,15 @@ export default function Table({
                     type="button"
                     color="green"
                     size="small"
-                    func={() => funcEdit(item.id)}
+                    func={() => editData(item.id)}
                   />
                   <Button
                     icons={<MdDeleteOutline size={20} className="text-white" />}
                     type="button"
                     color="red"
                     size="small"
-                    func={() => funcDelete(item.id)}
+                    func={() => deleteData(item.id)}
                   />
-                  {/* <button
-                    className="p-1 rounded-md bg-green-600"
-                    onClick={() => editData(item.id)}
-                  >
-                    <CiEdit size={20} className="text-white" />
-                  </button> */}
-                  {/* <button
-                    className="p-1 rounded-md bg-red-600"
-                    onClick={() => deleteData(item.id)}
-                  >
-                    <MdDeleteOutline size={20} className="text-white" />
-                  </button> */}
                 </td>
               </tr>
             ))}

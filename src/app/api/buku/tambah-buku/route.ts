@@ -2,11 +2,11 @@ import { addDataBuku, updateDataBuku } from "@/lib/db";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  console.log({ body });
 
   try {
     if (!body.id) {
       const data = {
+        image: body.image,
         judulBuku: body.judul_buku,
         jenisBuku: body.jenis_buku,
         penerbit: body.penerbit,
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
     } else {
       const id = body.id;
       const dataEdit = {
+        image: body.image,
         judulBuku: body.judul_buku,
         jenisBuku: body.jenis_buku,
         penerbit: body.penerbit,

@@ -22,7 +22,8 @@ model User {
 }
 
 model Buku {
-  id              Int  @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
+  image           String  @db.Text
   judulBuku       String
   jenisBuku       String  
   penerbit        String

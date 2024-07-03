@@ -13,7 +13,7 @@ export default function TambahBuku() {
           <Button teks="Home" type="button" color="green" size="small" />
         </Link>
       </div>
-      <div className="w-full h-max mt-6 lg:mt-2">
+      <div className="w-full h-max mt-6 lg:mt-6">
         <Suspense fallback={<Loading />}>
           <FormTambah />
         </Suspense>
