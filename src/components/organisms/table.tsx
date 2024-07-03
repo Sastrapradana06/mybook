@@ -6,6 +6,7 @@ import Button from "../atoms/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "./loading";
+import { apiDeleteData } from "@/services/apiServices";
 
 type TableProps = {
   id: number;
@@ -28,30 +29,31 @@ export default function Table({ data }: { data: any }) {
 
   const deleteData = async (id: number) => {
     setIsLoading(true);
-    const res = await fetch("http://localhost:3000/api/buku/hapus-buku", {
-      method: "POST",
-      body: JSON.stringify({ id }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const data = await apiDeleteData("buku/hapus-buku", id);
+      if (data.status) {
+        setMessage({
+          status: true,
+          type: "success",
+          message: "Berhasil menghapus buku",
+        });
+      } else {
+        setMessage({
+          status: true,
+          type: "error",
+          message: "Gagal",
+        });
+      }
 
-    const data = await res.json();
-    if (data.status) {
-      setMessage({
-        status: true,
-        type: "success",
-        message: "Berhasil menghapus buku",
-      });
-    } else {
+      setIsLoading(false);
+    } catch (error) {
       setMessage({
         status: true,
         type: "error",
         message: "Gagal",
       });
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const editData = (id: number) => {

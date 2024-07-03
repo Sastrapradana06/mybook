@@ -6,7 +6,7 @@ export default function Home() {
       <div className="w-[90%] lg:w-[50%] p-4">
         <h1 className="text-3xl">Halaman Login</h1>
         <p className="text-[.9rem] text-gray-300">
-          <span className="text-[#4D44B5] font-semibold text-[1rem]">
+          <span className="text-yellow-500 font-semibold text-[1rem]">
             MyBook
           </span>{" "}
           , Website penyimpanan buku

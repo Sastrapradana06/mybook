@@ -6,6 +6,9 @@ import Input from "../atoms/input";
 import { useEffect, useRef, useState } from "react";
 import Loading from "../organisms/loading";
 import { useRouter, useSearchParams } from "next/navigation";
+import { apiGetById, apiPostData } from "@/services/apiServices";
+import { convertFileToBase64 } from "@/utils";
+import UploadFile from "./upload-file";
 
 export default function FormTambah() {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,56 +31,49 @@ export default function FormTambah() {
   });
 
   const handleBtn = () => {
-    console.log("pilih file");
     refImage.current?.click();
   };
 
-  const handlePilihFile = (e: any) => {
+  const handlePilihFile = async (e: any) => {
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const dataValue = { ...value, image: reader.result as string };
-      editData(dataValue);
-    };
-  };
+    console.log({ file });
 
-  console.log({ value });
+    if (!file) return;
+    const urlImg = await convertFileToBase64(file);
+    handleChange({ target: { name: "image", value: urlImg } });
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    const res = await fetch("http://localhost:3000/api/buku/tambah-buku", {
-      method: "POST",
-      body: JSON.stringify(value),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
+    try {
+      const data = await apiPostData("buku/tambah-buku", value);
 
-    if (data.status) {
-      // router.push("/home");
+      if (data.status) {
+        setMessage({
+          status: true,
+          message: data.message,
+        });
+        resetValue();
+      } else {
+        setMessage({
+          status: true,
+          message: data.message,
+        });
+      }
+      setIsLoading(false);
+    } catch (error) {
       setMessage({
         status: true,
-        message: data.message,
+        message: "Gagal",
       });
-      resetValue();
-    } else {
-      setMessage({
-        status: true,
-        message: data.message,
-      });
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleEdit = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `http://localhost:3000/api/buku/get-buku-id?id=${idEdit}`
-    );
-    const resData = await res.json();
+    const resData = await apiGetById("buku/get-buku-id?id", idEdit);
     if (resData.status) {
       const dataEdit = {
         id: resData.data.id,
@@ -105,17 +101,22 @@ export default function FormTambah() {
     <>
       {isLoading ? <Loading /> : null}
       {message.status && (
-        <div className="w-max mb-2 h-max m-auto">
-          <h1 className="text-[.9rem] text-blue-500 font-semibold capitalize">
+        <div className="w-max mb-4  h-max m-auto">
+          <h1 className="text-[.9rem] text-yellow-500 font-semibold capitalize">
             {message.message}
           </h1>
         </div>
       )}
       <form
-        className="w-full h-max lg:w-[60%]  m-auto flex flex-col gap-3 mb-5"
+        className="w-full h-max lg:w-[60%]  m-auto flex flex-col gap-3 pb-11"
         onSubmit={handleSubmit}
       >
-        <div className="w-full h-max flex flex-col gap-2">
+        <UploadFile
+          setUrl={(e: any) =>
+            handleChange({ target: { name: "image", value: e } })
+          }
+        />
+        {/* <div className="w-full h-max flex flex-col gap-2">
           <img
             src={value.image}
             alt=""
@@ -135,7 +136,7 @@ export default function FormTambah() {
             name="image"
             className="hidden"
           />
-        </div>
+        </div> */}
         <div className="w-full  h-max">
           <div className="mb-5">
             <label

@@ -8,20 +8,23 @@ import { useState } from "react";
 import useHandleInput from "@/hooks/useHandleInput";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Loading from "../organisms/loading";
 
 export default function LoginForm() {
+  const [isLoading, setIsLoading] = useState(false);
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [message, setMessage] = useState("");
 
   const { value, handleChange, resetValue } = useHandleInput({
-    email: "",
-    password: "",
+    email: "sastra@gmail.com",
+    password: "123",
   });
 
   const router = useRouter();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setIsLoading(true);
     setMessage("");
     const res = await signIn("credentials", {
       email: value.email,
@@ -33,66 +36,70 @@ export default function LoginForm() {
       setMessage("Periksa kembali email dan password anda");
       return;
     }
+    setMessage("Login Berhasil, anda akan diarahkan ke halaman utama");
     router.push("/home");
     resetValue();
-    console.log({ res });
+    setIsLoading(false);
   };
 
   return (
-    <form className="w-full h-max" onSubmit={handleSubmit}>
-      {message != "" && (
-        <div className="w-full mb-3 -mt-2">
-          <p className="text-[crimson]">{message}</p>
-        </div>
-      )}
-      <div className="mb-5">
-        <label
-          htmlFor="email"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Masukkan Email <span className="text-[crimson]">*</span>
-        </label>
-        <Input
-          name="email"
-          type="email"
-          placeholder="name@gmail.com"
-          size="small"
-          value={value.email}
-          setValue={handleChange}
-        />
-      </div>
-      <div className="w-full flex flex-col gap-2 text-[.9rem] mb-5">
-        <label htmlFor="password">
-          Masukkan Password <span className="text-[crimson]">*</span>
-        </label>
-        <div className="relative w-full">
-          <input
-            type={isShowPassword ? "text" : "password"}
-            name="password"
-            required
-            placeholder="Masukkan Password"
-            value={value.password}
-            onChange={handleChange}
-            className="w-full border p-3 outline-[#4D44B5] rounded-lg pr-10 text-black"
+    <>
+      {isLoading && <Loading />}
+      <form className="w-full h-max" onSubmit={handleSubmit}>
+        {message != "" && (
+          <div className="w-full mb-3 -mt-2">
+            <p className="text-yellow-500">{message}</p>
+          </div>
+        )}
+        <div className="mb-5">
+          <label
+            htmlFor="email"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Masukkan Email <span className="text-[crimson]">*</span>
+          </label>
+          <Input
+            name="email"
+            type="email"
+            placeholder="name@gmail.com"
+            size="small"
+            value={value.email}
+            setValue={handleChange}
           />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer">
-            {isShowPassword ? (
-              <VscEye
-                className="text-black"
-                size={23}
-                onClick={() => setIsShowPassword(false)}
-              />
-            ) : (
-              <VscEyeClosed
-                className="text-black"
-                size={23}
-                onClick={() => setIsShowPassword(true)}
-              />
-            )}
+        </div>
+        <div className="w-full flex flex-col gap-2 text-[.9rem] mb-5">
+          <label htmlFor="password">
+            Masukkan Password <span className="text-[crimson]">*</span>
+          </label>
+          <div className="relative w-full">
+            <input
+              type={isShowPassword ? "text" : "password"}
+              name="password"
+              required
+              placeholder="Masukkan Password"
+              value={value.password}
+              onChange={handleChange}
+              className="w-full border p-3 outline-[#4D44B5] rounded-lg pr-10 text-black"
+            />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer">
+              {isShowPassword ? (
+                <VscEye
+                  className="text-black"
+                  size={23}
+                  onClick={() => setIsShowPassword(false)}
+                />
+              ) : (
+                <VscEyeClosed
+                  className="text-black"
+                  size={23}
+                  onClick={() => setIsShowPassword(true)}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      <Button teks="Login" type="submit" color="blue" size="medium" />
-    </form>
+        <Button teks="Login" type="submit" color="blue" size="medium" />
+      </form>
+    </>
   );
 }

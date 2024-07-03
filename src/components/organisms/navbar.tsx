@@ -15,7 +15,7 @@ export default function Navbar() {
           Hallo, {user?.name}
         </h1>
         <p className="text-[.9rem] text-gray-300 font-semibold">
-          Selamat datang di MyBook
+          Selamat datang di, <span className="text-yellow-500">MyBook</span>
         </p>
       </div>
       <Button
