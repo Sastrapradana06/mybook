@@ -19,10 +19,19 @@ export const apiPostData = async (resource: string, data: dataPostType) => {
   return dataJson;
 };
 
-export const apiDeleteData = async (resource: string, id: number | string) => {
+export const apiPostFormData = async (resource: string, data: any) => {
   const res = await fetch(`api/${resource}`, {
     method: "POST",
-    body: JSON.stringify({ id }),
+    body: data,
+  });
+  const dataJson = await res.json();
+  return dataJson;
+};
+
+export const apiDeleteData = async (resource: string, data: any) => {
+  const res = await fetch(`api/${resource}`, {
+    method: "POST",
+    body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
     },

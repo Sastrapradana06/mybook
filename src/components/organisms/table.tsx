@@ -27,10 +27,13 @@ export default function Table({ data }: { data: any }) {
 
   const router = useRouter();
 
-  const deleteData = async (id: number) => {
+  const deleteData = async (id: number, image: string) => {
     setIsLoading(true);
     try {
-      const data = await apiDeleteData("buku/hapus-buku", id);
+      const data = await apiDeleteData("buku/hapus-buku", {
+        id: id,
+        image: image,
+      });
       if (data.status) {
         setMessage({
           status: true,
@@ -88,7 +91,7 @@ export default function Table({ data }: { data: any }) {
                 Judul Buku
               </th>
               <th scope="col" className="px-6 py-3">
-                Image
+                Cover
               </th>
               <th scope="col" className="px-6 py-3">
                 Jenis Buku
@@ -141,7 +144,7 @@ export default function Table({ data }: { data: any }) {
                     type="button"
                     color="red"
                     size="small"
-                    func={() => deleteData(item.id)}
+                    func={() => deleteData(item.id, item.image)}
                   />
                 </td>
               </tr>

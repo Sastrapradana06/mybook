@@ -2,6 +2,14 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
+type DataBuku = {
+  image: string | null;
+  judulBuku: string;
+  jenisBuku: string;
+  penerbit: string;
+  tahunTerbit: string;
+};
+
 export async function handleLogin(email: string, password: string) {
   try {
     const user = await prisma.user.findUnique({
@@ -81,11 +89,11 @@ export async function getBukuById(id: number) {
   }
 }
 
-export async function updateDataBuku(id: number | string, data: any) {
+export async function updateDataBuku(id: any, data: any) {
   try {
     const buku = await prisma.Buku.update({
       where: {
-        id: id,
+        id: parseInt(id),
       },
       data,
     });

@@ -6,11 +6,16 @@ import Input from "../atoms/input";
 import { useEffect, useRef, useState } from "react";
 import Loading from "../organisms/loading";
 import { useRouter, useSearchParams } from "next/navigation";
-import { apiGetById, apiPostData } from "@/services/apiServices";
+import {
+  apiGetById,
+  apiPostData,
+  apiPostFormData,
+} from "@/services/apiServices";
 import { convertFileToBase64 } from "@/utils";
 import UploadFile from "./upload-file";
 
 export default function FormTambah() {
+  const [imgPriview, setImgPriview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({
     status: false,
@@ -39,15 +44,27 @@ export default function FormTambah() {
     console.log({ file });
 
     if (!file) return;
-    const urlImg = await convertFileToBase64(file);
-    handleChange({ target: { name: "image", value: urlImg } });
+    const urlImg = URL.createObjectURL(file);
+    setImgPriview(urlImg);
+    editData({ ...value, file: file });
   };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
-      const data = await apiPostData("buku/tambah-buku", value);
+      const formData = new FormData();
+      formData.append("file", value.file);
+      formData.append("id", value.id);
+      formData.append("image", value.image);
+      formData.append("judul_buku", value.judul_buku);
+      formData.append("jenis_buku", value.jenis_buku);
+      formData.append("penerbit", value.penerbit);
+      formData.append("tahun_terbit", value.tahun_terbit);
+
+      const url = value.id ? "buku/edit-buku" : "buku/tambah-buku";
+      const data = await apiPostFormData(url, formData);
 
       if (data.status) {
         setMessage({
@@ -83,6 +100,7 @@ export default function FormTambah() {
         penerbit: resData.data.penerbit,
         tahun_terbit: resData.data.tahunTerbit,
       };
+      setImgPriview(dataEdit.image);
       editData(dataEdit);
     } else {
       router.push("/home");
@@ -111,21 +129,21 @@ export default function FormTambah() {
         className="w-full h-max lg:w-[60%]  m-auto flex flex-col gap-3 pb-11"
         onSubmit={handleSubmit}
       >
-        <UploadFile
+        {/* <UploadFile
           setUrl={(e: any) =>
             handleChange({ target: { name: "image", value: e } })
           }
-        />
-        {/* <div className="w-full h-max flex flex-col gap-2">
+        /> */}
+        <div className="w-full h-max flex flex-col gap-2">
           <img
-            src={value.image}
+            src={imgPriview}
             alt=""
             className="w-[300px] h-[250px] border rounded-md object-cover"
           />
           <Button
-            teks="Pilih Gambar"
+            teks={value.image ? "Ubah Cover Buku" : "Pilih Cover Buku"}
             type="button"
-            color="green"
+            color={value.image ? "yellow" : "green"}
             size="small"
             func={handleBtn}
           />
@@ -136,7 +154,7 @@ export default function FormTambah() {
             name="image"
             className="hidden"
           />
-        </div> */}
+        </div>
         <div className="w-full  h-max">
           <div className="mb-5">
             <label
@@ -199,7 +217,12 @@ export default function FormTambah() {
             />
           </div>
         </div>
-        <Button teks="Simpan" type="submit" color="blue" size="small" />
+        <Button
+          teks={value.image ? "Simpan perubahan" : "Simpan Buku"}
+          type="submit"
+          color="blue"
+          size="small"
+        />
       </form>
     </>
   );
