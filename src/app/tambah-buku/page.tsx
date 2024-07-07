@@ -7,9 +7,12 @@ import { Suspense } from "react";
 export default function TambahBuku() {
   return (
     <>
-      <div className="w-full h-max">
+      <div className="w-full h-max flex gap-2 items-center">
         <Link href={"/home"}>
           <Button teks="Home" type="button" color="green" size="small" />
+        </Link>
+        <Link href={"/anime"}>
+          <Button teks="Anime" type="button" color="green" size="small" />
         </Link>
       </div>
       <div className="w-full h-max mt-6 lg:mt-6">

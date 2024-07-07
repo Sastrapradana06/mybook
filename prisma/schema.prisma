@@ -30,5 +30,12 @@ model Buku {
   tahunTerbit     String
 } 
 
+model Anime {
+  id          Int     @id @default(autoincrement())
+  judul       String
+  studio      String
+  genre       String
+}
+
 
 

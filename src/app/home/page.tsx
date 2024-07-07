@@ -9,9 +9,12 @@ export default async function Home() {
 
   return (
     <>
-      <div className="w-full h-max">
+      <div className="w-full h-max flex gap-2 items-center">
         <Link href={"/tambah-buku"}>
           <Button teks="Tambah Buku" type="button" color="green" size="small" />
+        </Link>
+        <Link href={"/produk"}>
+          <Button teks="Product" type="button" color="green" size="small" />
         </Link>
       </div>
       <div className="w-full h-max mt-5">
