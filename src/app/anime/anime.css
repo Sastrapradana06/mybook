@@ -1,0 +1,4 @@
+.sortable-item[data-is-dragging="true"] {
+  background-color: gray; /* Warna latar belakang abu-abu saat di-drag */
+  opacity: 0.8; /* Mengatur opacity untuk efek tambahan */
+}

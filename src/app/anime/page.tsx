@@ -1,197 +1,144 @@
 "use client";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Button from "@/components/atoms/button";
+import { DndContext } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import "./anime.css";
 
-export default function Anime() {
-  const initialData = [
-    {
-      id: 1,
-      judul: "Naruto",
-      studio: "Studio Pierrot",
-      genre: "Action, Shounen",
-    },
-    {
-      id: 2,
-      judul: "Kimetsu no Yaiba",
-      studio: "Ufotable",
-      genre: "Action, Shounen",
-    },
-    {
-      id: 3,
-      judul: "One Piece",
-      studio: "Toei Animation",
-      genre: "Action, Adventure",
-    },
-    {
-      id: 4,
-      judul: "Attack on Titan",
-      studio: "Wit Studio",
-      genre: "Action, Drama",
-    },
-    {
-      id: 5,
-      judul: "My Hero Academia",
-      studio: "Bones",
-      genre: "Action, Comedy",
-    },
-  ];
+type AnimeProps = {
+  id: number;
+  name: string;
+  studio: string;
+};
 
-  const dataAnime = [
-    ...initialData,
-    {
-      id: 6,
-      judul: "Sword Art Online",
-      studio: "A-1 Pictures",
-      genre: "Action, Fantasy",
-    },
-    {
-      id: 7,
-      judul: "Death Note",
-      studio: "Madhouse",
-      genre: "Mystery, Psychological",
-    },
-    {
-      id: 8,
-      judul: "Fullmetal Alchemist: Brotherhood",
-      studio: "Bones",
-      genre: "Action, Adventure",
-    },
-    {
-      id: 9,
-      judul: "Dragon Ball Z",
-      studio: "Toei Animation",
-      genre: "Action, Adventure",
-    },
-    {
-      id: 10,
-      judul: "Hunter x Hunter",
-      studio: "Madhouse",
-      genre: "Action, Adventure",
-    },
-  ];
+const dataAnime = [
+  {
+    id: 1,
+    name: "Kimetsu no Yaiba",
+    studio: "ufotable",
+  },
+  {
+    id: 2,
+    name: "Black Clover",
+    studio: "Studio Pierrot",
+  },
+  {
+    id: 3,
+    name: "Jujutsu Kaisen",
+    studio: "Mappa",
+  },
+  {
+    id: 4,
+    name: "Hunter x Hunter",
+    studio: "Madhouse",
+  },
+];
 
-  const [data, setData] = useState(initialData);
-  const [isLoading, setIsLoading] = useState(false);
+const SortableItem = ({
+  id,
+  children,
+}: {
+  id: number;
+  children: React.ReactNode;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: id.toString() });
 
-  const handleData = () => {
-    if (data.length >= dataAnime.length) return;
-
-    setIsLoading(true);
-    setTimeout(() => {
-      const nextData = dataAnime.slice(data.length, data.length + 1);
-      setData((prevData) => [...prevData, ...nextData]);
-      setIsLoading(false);
-    }, 3000); // Simulasi waktu pemuatan data
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    border: isDragging ? "2px dashed yellow" : "none",
   };
 
-  const tableRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      data-is-dragging={isDragging}
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
+  );
+};
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const element = tableRef.current;
-      if (
-        element &&
-        element.scrollHeight - element.scrollTop === element.clientHeight
-      ) {
-        handleData();
-      }
-    };
+export default function Anime() {
+  const [items, setItems] = useState<AnimeProps[]>(dataAnime);
 
-    const element = tableRef.current;
-    if (element) {
-      element.addEventListener("scroll", handleScroll);
+  const handleDrag = (event: any) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      setItems((prevItems) => {
+        const activeIndex = prevItems.findIndex(
+          (item) => item.id.toString() === active.id
+        );
+        const overIndex = prevItems.findIndex(
+          (item) => item.id.toString() === over.id
+        );
+        const newArr = [...prevItems];
+        newArr.splice(overIndex, 0, ...newArr.splice(activeIndex, 1));
+        return newArr;
+      });
     }
-
-    return () => {
-      if (element) {
-        element.removeEventListener("scroll", handleScroll);
-      }
-    };
-  }, [data]);
+  };
 
   return (
     <>
       <div className="w-full h-max flex gap-2 items-center">
-        <Link href={"/home"}>
+        <Link href="/home">
           <Button teks="Home" type="button" color="green" size="small" />
+        </Link>
+        <Link href="/test">
+          <Button teks="Test" type="button" color="green" size="small" />
         </Link>
       </div>
       <div className="mt-3 ">
         <h1 className="text-[1.3rem] font-semibold text-yellow-600">
-          Data Anime
+          Top Anime
         </h1>
+        <p className="text-[.9rem] text-gray-300">
+          Drag Card untuk mengurutkan
+        </p>
       </div>
-      <div
-        className="relative max-h-[280px] overflow-x-auto shadow-md sm:rounded-lg mt-4"
-        ref={tableRef}
-      >
-        <table className="w-full  text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text-xs  uppercase bg-lime-600 text-white">
-            <tr>
-              <th scope="col" className="px-6 py-3">
-                No
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Judul
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Studio
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Genre
-              </th>
-              {/* <th scope="col" className="px-6 py-3">
-                Action
-              </th> */}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item: any, i: any) => (
-              <tr
-                key={item.id}
-                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-              >
-                <td className="px-6 py-4">{i + 1}</td>
-
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white capitalize"
-                >
-                  {item.judul}
-                </td>
-                <td className="px-6 py-4 capitalize">{item.studio}</td>
-                <td className="px-6 py-4 capitalize">{item.genre}</td>
-                {/* <td className="px-6 py-4 flex items-center gap-3">
-                  <Button
-                    icons={<CiEdit size={20} className="text-white" />}
-                    type="button"
-                    color="green"
-                    size="small"
-                    func={() => editData(item.id)}
-                  />
-                  <Button
-                    icons={<MdDeleteOutline size={20} className="text-white" />}
-                    type="button"
-                    color="red"
-                    size="small"
-                    func={() => deleteData(item.id, item.image)}
-                  />
-                </td> */}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {isLoading && (
-          <div className="w-full h-max bg-transparent  p-2 flex justify-center items-center">
-            <AiOutlineLoading3Quarters
-              size={30}
-              className="text-white animate-spin"
-            />
-          </div>
-        )}
-      </div>
+      <DndContext onDragEnd={handleDrag}>
+        <div className="w-full h-max mt-6 pb-10">
+          <SortableContext
+            items={items.map((item) => item.id.toString())}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="w-full flex flex-col gap-4 items-center">
+              {items.map((data, i) => (
+                <SortableItem id={data.id} key={data.id}>
+                  <div className="w-[400px] h-[100px] border rounded-md bg-teal-600 flex flex-col justify-center items-center transition-transform duration-300 ease-in-out">
+                    <h1 className="text-[1rem] font-semibold tracking-[1px] text-yellow-500">
+                      #{i + 1}
+                    </h1>
+                    <h1 className="text-[1.2rem] font-semibold tracking-[1px]">
+                      {data.name}
+                    </h1>
+                    <p className="uppercase">{data.studio}</p>
+                  </div>
+                </SortableItem>
+              ))}
+            </div>
+          </SortableContext>
+        </div>
+      </DndContext>
     </>
   );
 }

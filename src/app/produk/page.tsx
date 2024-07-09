@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/atoms/button";
+import DraggableTable from "@/components/organisms/draggable-table";
 import Link from "next/link";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -33,6 +34,8 @@ export default function Produk() {
 
     setIsLoading(false);
   };
+
+  const columnsTable = ["No", "Title", "Category", "Brand", "Price"];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,6 +72,9 @@ export default function Produk() {
         <Link href={"/home"}>
           <Button teks="Home" type="button" color="green" size="small" />
         </Link>
+        <Link href={"/test"}>
+          <Button teks="Test" type="button" color="green" size="small" />
+        </Link>
       </div>
       <div className="mt-3">
         <h1 className="text-[1.3rem] font-semibold text-yellow-600">
@@ -76,10 +82,10 @@ export default function Produk() {
         </h1>
       </div>
       <div
-        className="relative max-h-[300px] overflow-x-auto shadow-md sm:rounded-lg mt-4"
+        className="relative max-h-[350px] overflow-x-auto shadow-md sm:rounded-lg mt-4"
         ref={tableRef}
       >
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        {/* <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs uppercase bg-lime-600 text-white">
             <tr>
               <th scope="col" className="px-6 py-3">
@@ -123,7 +129,8 @@ export default function Produk() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table> */}
+        <DraggableTable columnsTable={columnsTable} items={data ? data : []} />
         {isLoading && (
           <div className="w-full h-max bg-transparent p-2 flex justify-center items-center">
             <AiOutlineLoading3Quarters
@@ -133,6 +140,7 @@ export default function Produk() {
           </div>
         )}
       </div>
+      {/* <DraggableTable columns={columns} data={dataTable} /> */}
     </>
   );
 }
