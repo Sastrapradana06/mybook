@@ -103,8 +103,8 @@ export default function Anime() {
         <Link href="/home">
           <Button teks="Home" type="button" color="green" size="small" />
         </Link>
-        <Link href="/test">
-          <Button teks="Test" type="button" color="green" size="small" />
+        <Link href="/produk">
+          <Button teks="Product" type="button" color="green" size="small" />
         </Link>
       </div>
       <div className="mt-3 ">
