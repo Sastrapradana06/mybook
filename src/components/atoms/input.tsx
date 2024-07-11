@@ -6,6 +6,7 @@ interface InputProps {
   placeholder?: string;
   size: "small" | "medium" | "large";
   value?: string;
+  onBlur?: any;
   setValue?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -15,6 +16,7 @@ const Input: React.FC<InputProps> = ({
   placeholder,
   size,
   value,
+  onBlur,
   setValue,
 }) => {
   return (
@@ -25,6 +27,7 @@ const Input: React.FC<InputProps> = ({
       onChange={setValue}
       placeholder={placeholder}
       required={true}
+      onBlur={onBlur}
       className={`w-full border p-2 outline-[#4D44B5]  pr-10 text-black ${inputSize[size]}`}
     />
   );
